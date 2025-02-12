@@ -13,8 +13,10 @@ growTerm (TermLambda v t) nVars =
 growList :: [Term] -> Int -> [Term]
 growList ts nVars = foldr (\t r -> ((\t' -> growTerm t' nVars) t ++) . r) id ts []
 
-allTerms :: Int -> [Term]
-allTerms nVars = concat $ iterate (\l -> growList l nVars) [(TermVar x) | x <- [1..nVars]]
+allTermsNVars :: Int -> [Term]
+allTermsNVars nVars = concat $ iterate (\l -> growList l nVars) [(TermVar x) | x <- [1..nVars]]
+
+allTerms = [allTermsNVars i !! (n - i) | n <- [1..], i <- [1..n]]
 
 seeN n = mapM_ print . take n
 
