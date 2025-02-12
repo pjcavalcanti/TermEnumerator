@@ -1,5 +1,7 @@
+import qualified Data.Set as Set
+
 data Term = TermVar Int | TermApp Term Term | TermLambda Int Term
-  deriving (Eq)
+  deriving (Eq, Ord)
 
 growTerm :: Term -> Int -> [Term]
 growTerm (TermVar v) nVars =
@@ -18,7 +20,16 @@ allTermsNVars nVars = concat $ iterate (\l -> growList l nVars) [(TermVar x) | x
 
 allTerms = [allTermsNVars i !! (n - i) | n <- [1..], i <- [1..n]]
 
-seeN n = mapM_ print . take n
+see_n :: (Ord a, Show a) => Int -> [a] -> IO ()
+see_n n xs = aux n Set.empty xs
+  where
+    aux 0 _ _      = return ()
+    aux _ _ []     = return ()
+    aux m seen (x:xs)
+      | x `Set.member` seen = aux m seen xs
+      | otherwise = do
+          print x
+          aux (m-1) (Set.insert x seen) xs
 
 -- For the sake of readability
 prettyTerm :: Term -> String
